@@ -78,8 +78,8 @@ jobs:
             --s3-bucket ${{vars.DEVELOPMENT_ARTIFACTS_BUCKET}} \
             --no-fail-on-empty-changeset \
             --role-arn ${{vars.DEVELOPMENT_CLOUDFORMATION_EXECUTION_ROLE}} \
-            --parameter-overrides TagEnvironment=$(echo ${FEATURE_BRANCH_NAME} | tr '/' '-') \
-              CertificateArn=${{vars.CERTIFICATE_ARN}} \
+            --parameter-overrides TagEnvironment=$(echo ${FEATURE_BRANCH_NAME} | tr '/' '-'), \
+              CertificateArn=${{vars.CERTIFICATE_ARN}}, \
               HostedZoneId=${{vars.HOSTED_ZONE_ID}}
 
   build-and-deploy-development:
@@ -120,8 +120,8 @@ jobs:
             --s3-bucket ${{vars.DEVELOPMENT_ARTIFACTS_BUCKET}} \
             --no-fail-on-empty-changeset \
             --role-arn ${{vars.DEVELOPMENT_CLOUDFORMATION_EXECUTION_ROLE}} \
-            --parameter-overrides TagEnvironment=$(echo ${FEATURE_BRANCH_NAME} | tr '/' '-') \
-              CertificateArn=${{vars.CERTIFICATE_ARN}} \
+            --parameter-overrides TagEnvironment=$(echo ${FEATURE_BRANCH_NAME} | tr '/' '-'), \
+              CertificateArn=${{vars.CERTIFICATE_ARN}}, \
               HostedZoneId=${{vars.HOSTED_ZONE_ID}}
 
   build-and-deploy-production:
@@ -166,6 +166,6 @@ jobs:
             --s3-bucket ${{vars.PRODUCTION_ARTIFACTS_BUCKET}} \
             --no-fail-on-empty-changeset \
             --role-arn ${{vars.PRODUCTION_CLOUDFORMATION_EXECUTION_ROLE}} \
-            --parameter-overrides TagEnvironment=$(echo ${FEATURE_BRANCH_NAME} | tr '/' '-') \
-              CertificateArn=${{vars.CERTIFICATE_ARN}} \
+            --parameter-overrides TagEnvironment=$(echo ${FEATURE_BRANCH_NAME} | tr '/' '-'), \
+              CertificateArn=${{vars.CERTIFICATE_ARN}}, \
               HostedZoneId=${{vars.HOSTED_ZONE_ID}}
