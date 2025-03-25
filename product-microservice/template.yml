@@ -1,0 +1,85 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+  LambdaAuthorizerArn:
+    Type: String
+    Description: ARN for the lambda authorizer
+  TagEnvironment: 
+    Type: String
+    Default: production
+    Description: Environment Type.
+  TagProject:
+    Type: String
+    Default: devops-na-nuvem-serverless-workshop
+    Description: Project Name.
+
+Resources:
+
+  DynamoTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      TableName: products
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      PrimaryKey:
+        Name: Id
+        Type: String
+      SSESpecification:
+        SSEEnabled: true
+      Tags:
+        Project: !Ref TagProject
+        Environment: !Ref TagEnvironment
+
+  ApiGatewayApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: production
+      Auth:
+        DefaultAuthorizer: LambdaAuthorizer
+        Authorizers:
+          LambdaAuthorizer:
+            FunctionArn: !Ref LambdaAuthorizerArn
+            Identity:
+              Header: Authorization
+            Type: TOKEN
+      Tags:
+        Project: !Ref TagProject
+        Environment: !Ref TagEnvironment
+
+  ApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: nodejs22.x
+      Handler: handler.main
+      Timeout: 30
+      Policies:
+      - AWSLambdaBasicExecutionRole
+      - AmazonDynamoDBFullAccess
+      Environment:
+        Variables:
+          DYNAMO_TABLE_NAME: !Ref DynamoTable
+      Events:
+        ProductsRoot:
+          Type: Api
+          Properties:
+            Path: /products
+            Method: ANY
+            RestApiId: !Ref ApiGatewayApi
+        ProductsAnythingElse:
+          Type: Api
+          Properties:
+            Path: /products/{proxy+}
+            Method: ANY
+            RestApiId: !Ref ApiGatewayApi
+      Tags:
+        Project: !Ref TagProject
+        Environment: !Ref TagEnvironment
+
+  ApiGatewayApiMapping:
+    Type: AWS::ApiGateway::BasePathMapping
+    Properties:
+      BasePath: products
+      DomainName: backend.devopsnanuvemweek.com
+      RestApiId: !Ref ApiGatewayApi
+      Stage: !Ref ApiGatewayApi.Stage

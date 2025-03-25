@@ -1,0 +1,111 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+
+Parameters:
+  LambdaAuthorizerArn:
+    Type: String
+    Description: ARN for the lambda authorizer
+  CertificateArn:
+    Type: String
+    Description: ACM Certificate ARN
+  HostedZoneId:
+    Type: String
+    Description: Route53 Hosted Zone ID
+  TagEnvironment: 
+    Type: String
+    Default: production
+    Description: Environment Type.
+  TagProject:
+    Type: String
+    Default: devops-na-nuvem-serverless-workshop
+    Description: Project Name.
+
+Resources:
+
+  DynamoTable:
+    Type: AWS::Serverless::SimpleTable
+    Properties:
+      TableName: stocks
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      PrimaryKey:
+        Name: Id
+        Type: String
+      SSESpecification:
+        SSEEnabled: true
+      Tags:
+        Project: !Ref TagProject
+        Environment: !Ref TagEnvironment
+
+  ApiGatewayApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: production
+      Auth:
+        DefaultAuthorizer: LambdaAuthorizer
+        Authorizers:
+          LambdaAuthorizer:
+            FunctionArn: !Ref LambdaAuthorizerArn
+            Identity:
+              Header: Authorization
+            Type: REQUEST
+      Tags:
+        Project: !Ref TagProject
+        Environment: !Ref TagEnvironment
+
+  # ApiGatewayDomain:
+  #   Type: AWS::ApiGateway::DomainName
+  #   Properties:
+  #     CertificateArn: !Ref CertificateArn
+  #     DomainName: backend.devopsnanuvemweek.com
+  #     SecurityPolicy: TLS_1_2
+  #     EndpointConfiguration:
+  #       Types:
+  #       - EDGE
+
+  # ApiGatewayDomainMapping:
+  #   Type: AWS::Route53::RecordSet
+  #   Properties:
+  #     HostedZoneId: !Ref HostedZoneId
+  #     Name: backend.devopsnanuvemweek.com
+  #     Type: A
+  #     AliasTarget:
+  #       DNSName: !GetAtt ApiGatewayDomain.DistributionDomainName
+  #       HostedZoneId: !GetAtt ApiGatewayDomain.DistributionHostedZoneId
+
+  ApiGatewayApiMapping:
+    Type: AWS::ApiGateway::BasePathMapping
+    Properties:
+      BasePath: stocks
+      DomainName: !Ref ApiGatewayDomain
+      RestApiId: !Ref ApiGatewayApi
+      Stage: production
+
+  ApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: dotnet8
+      Handler: StockApi
+      Timeout: 30
+      Policies:
+      - AWSLambdaBasicExecutionRole
+      - AmazonDynamoDBFullAccess
+      Environment:
+        Variables:
+          DYNAMO_TABLE_NAME: !Ref DynamoTable
+      Events:
+        StocksRoot:
+          Type: Api
+          Properties:
+            Path: /stocks
+            Method: ANY
+            RestApiId: !Ref ApiGatewayApi
+        StocksAnythingElse:
+          Type: Api
+          Properties:
+            Path: /stocks/{proxy+}
+            Method: ANY
+            RestApiId: !Ref ApiGatewayApi
+      Tags:
+        Project: !Ref TagProject
+        Environment: !Ref TagEnvironment
