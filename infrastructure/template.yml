@@ -55,7 +55,7 @@ Resources:
     Type: AWS::Cognito::UserPoolClient
     Properties:
       UserPoolId: !Ref CognitoUserPool
-      ClientName: serverless-workshop-pool-client-${TagEnvironment}
+      ClientName: !Sub serverless-workshop-pool-client-${TagEnvironment}
       GenerateSecret: false
       ExplicitAuthFlows:
       - ALLOW_USER_PASSWORD_AUTH
