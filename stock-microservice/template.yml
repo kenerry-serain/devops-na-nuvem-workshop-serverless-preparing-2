@@ -53,25 +53,25 @@ Resources:
         Project: !Ref TagProject
         Environment: !Ref TagEnvironment
 
-  # ApiGatewayDomain:
-  #   Type: AWS::ApiGateway::DomainName
-  #   Properties:
-  #     CertificateArn: !Ref CertificateArn
-  #     DomainName: backend.devopsnanuvemweek.com
-  #     SecurityPolicy: TLS_1_2
-  #     EndpointConfiguration:
-  #       Types:
-  #       - EDGE
+  ApiGatewayDomain:
+    Type: AWS::ApiGateway::DomainName
+    Properties:
+      CertificateArn: !Ref CertificateArn
+      DomainName: backend.devopsnanuvemweek.com
+      SecurityPolicy: TLS_1_2
+      EndpointConfiguration:
+        Types:
+        - EDGE
 
-  # ApiGatewayDomainMapping:
-  #   Type: AWS::Route53::RecordSet
-  #   Properties:
-  #     HostedZoneId: !Ref HostedZoneId
-  #     Name: backend.devopsnanuvemweek.com
-  #     Type: A
-  #     AliasTarget:
-  #       DNSName: !GetAtt ApiGatewayDomain.DistributionDomainName
-  #       HostedZoneId: !GetAtt ApiGatewayDomain.DistributionHostedZoneId
+  ApiGatewayDomainMapping:
+    Type: AWS::Route53::RecordSet
+    Properties:
+      HostedZoneId: !Ref HostedZoneId
+      Name: backend.devopsnanuvemweek.com
+      Type: A
+      AliasTarget:
+        DNSName: !GetAtt ApiGatewayDomain.DistributionDomainName
+        HostedZoneId: !GetAtt ApiGatewayDomain.DistributionHostedZoneId
 
   ApiGatewayApiMapping:
     Type: AWS::ApiGateway::BasePathMapping

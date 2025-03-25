@@ -2,12 +2,6 @@ AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 
 Parameters:
-  CertificateArn:
-    Type: String
-    Description: ACM Certificate ARN
-  HostedZoneId:
-    Type: String
-    Description: Route53 Hosted Zone ID
   TagEnvironment: 
     Type: String
     Default: production
@@ -59,24 +53,3 @@ Resources:
       ExplicitAuthFlows:
         - ALLOW_USER_PASSWORD_AUTH
         - ALLOW_REFRESH_TOKEN_AUTH
-
-
-  ApiGatewayDomain:
-    Type: AWS::ApiGateway::DomainName
-    Properties:
-      CertificateArn: !Ref CertificateArn
-      DomainName: backend.devopsnanuvemweek.com
-      SecurityPolicy: TLS_1_2
-      EndpointConfiguration:
-        Types:
-        - EDGE
-
-  ApiGatewayDomainMapping:
-    Type: AWS::Route53::RecordSet
-    Properties:
-      HostedZoneId: !Ref HostedZoneId
-      Name: backend.devopsnanuvemweek.com
-      Type: A
-      AliasTarget:
-        DNSName: !GetAtt ApiGatewayDomain.DistributionDomainName
-        HostedZoneId: !GetAtt ApiGatewayDomain.DistributionHostedZoneId
