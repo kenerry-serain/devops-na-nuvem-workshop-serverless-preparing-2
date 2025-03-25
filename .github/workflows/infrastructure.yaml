@@ -121,7 +121,7 @@ jobs:
             --s3-bucket ${{vars.DEVELOPMENT_ARTIFACTS_BUCKET}} \
             --no-fail-on-empty-changeset \
             --role-arn ${{vars.DEVELOPMENT_CLOUDFORMATION_EXECUTION_ROLE}} \
-            --parameter-overrides TagEnvironment=$(echo ${FEATURE_BRANCH_NAME} | tr '/' '-'), \
+            --parameter-overrides TagEnvironment=development, \
               CertificateArn=${{vars.CERTIFICATE_ARN}}, \
               HostedZoneId=${{vars.HOSTED_ZONE_ID}}
 
@@ -167,6 +167,6 @@ jobs:
             --s3-bucket ${{vars.PRODUCTION_ARTIFACTS_BUCKET}} \
             --no-fail-on-empty-changeset \
             --role-arn ${{vars.PRODUCTION_CLOUDFORMATION_EXECUTION_ROLE}} \
-            --parameter-overrides TagEnvironment=$(echo ${FEATURE_BRANCH_NAME} | tr '/' '-'), \
+            --parameter-overrides TagEnvironment=production, \
               CertificateArn=${{vars.CERTIFICATE_ARN}}, \
               HostedZoneId=${{vars.HOSTED_ZONE_ID}}
