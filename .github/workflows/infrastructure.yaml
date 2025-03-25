@@ -25,6 +25,7 @@ jobs:
   delete-feature:
     if: startsWith(github.event.ref, 'feature') && github.event_name == 'delete'
     runs-on: ubuntu-latest
+    environment: development
     steps:
       - uses: actions/checkout@v3
       - uses: aws-actions/setup-sam@v2
@@ -52,6 +53,7 @@ jobs:
   build-and-deploy-feature:
     if: startsWith(github.ref, 'refs/heads/feature')
     runs-on: ubuntu-latest
+    environment: development
     steps:
       - uses: actions/checkout@v3
       - uses: aws-actions/setup-sam@v2
